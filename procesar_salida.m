@@ -2,8 +2,8 @@
 out='resumen/';
 mkdir(out);
 outfile=[out 'salida.xls'];
-row = {'Imagen','C','SSIM','F'};
-xlswrite(outfile,row,1,'A1:D1');
+row = {'Imagen','C','SSIM','F','cuartil3','max','min','quartil1'};
+xlswrite(outfile,row,1,'A1:H1');
 
 
 idx=2;
@@ -36,10 +36,23 @@ for i = 1 : length(srcFiles)
         T1
 
         f=mean(T2);
-        c=mean(T1(:,1));ssim=mean(T1(:,2));
-        row = {srcFiles(i).name,c,ssim,f};
+        mx=max(T2)
+        idx = find(T==mx,1);
+        
+        c=max(T1(idx,1));
+        ssim=max(T1(idx,2));
+        
+        cuartil=quantile(T2,3);
+        cuartil
+         cuartil3=cuartil(3);
+         maxi=max(T2);
+         mini=min(T2);
+         quartil1=cuartil(1);
+
+        
+        row = {srcFiles(i).name,c,ssim,f,cuartil3,maxi,mini,quartil1};
     
-        xlRange = strcat('A',int2str(idx),':D',int2str(idx));
+        xlRange = strcat('A',int2str(idx),':H',int2str(idx));
         xlRange 
         row 
         xlswrite(outfile,row,1,xlRange);

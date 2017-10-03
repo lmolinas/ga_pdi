@@ -15,7 +15,7 @@ f_fitness = @(S)funcion_objetivo(I,S,size_cuadrante,CONTRASTE(I)/127.5);
 % definir los parametros del GA
 opts = gaoptimset(@ga);
 opts.TolFun=0;
-opts.StallGenLimit=600;
+opts.StallGenLimit=1000;
 opts.Display='iter';
 opts.PopulationType='bitstring';
 opts.PopulationSize=30;
@@ -31,7 +31,7 @@ fprintf(fbest,'Tiempo; best; promedio; cuartil3; max; min; quartil1;c ;ssim\n');
 
 
 F=[];
-tic()
+tt=tic()
 for i=1:10
     fid=fopen(strcat(out,'iter_',int2str(i),'.csv'),'w');
     tini=tic();
@@ -41,7 +41,7 @@ for i=1:10
     fclose(fid);
 end
 fclose(fbest);
-final=toc();
+final=toc(tt);
 if isa(I,'gpuArray') 
     clear I;
 end

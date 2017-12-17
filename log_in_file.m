@@ -1,4 +1,4 @@
-function [state, options,optchanged] = log_in_file(options,state,flag,fid,fbest,tini,I,dimension)
+function [state, options,optchanged] = log_in_file(options,state,flag,fid,fbest,tini,I,dimension,out,ite)
 %LOG_IN_FILE Summary of this function goes here
 %   Detailed explanation goes her
 persistent h1 history r;
@@ -19,16 +19,20 @@ switch flag
         q=quantile(score,3);
         fprintf(fid,'%f; %f; %f; %f; %f; %f; %f\n',state.Generation,state.Best(state.Generation),q(2),q(3),max(score),min(score),q(1));
     case 'done'
-        ss = size(history,3);
-        history(:,:,ss+1) = state.Population;
-        assignin('base','gapopulationhistory',history);
+        %ss = size(history,3);
+        %history(:,:,ss+1) = state.Population;
+        %assignin('base','gapopulationhistory',history);
         
         ibest = state.Best(end);
         ibest = find(state.Score == ibest,1,'last');
         bestx = state.Population(ibest,:);        
 
-        SR=convertir_individuo2se(bestx,dimension);             
+        SR=convertir_individuo2se(bestx,dimension);
         R=metodologia_morfologica(I, strel('arbitrary',SR));
+        imwrite(SR,strcat(strcat(out, ite), '_se.png'));
+        imwrite(gather(R),strcat(strcat(out, ite), '_t.png'));
+        
+        
         [c2]=CONTRASTE(R)/127.5;
         [similaridad]=nssim(I,R);
         if isa(R,'gpuArray') 

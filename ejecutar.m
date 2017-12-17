@@ -1,10 +1,10 @@
 addpath('db');
-out='out_01709/';
+out='out_20171213-c/';
 db='db/';
 mkdir(out);
 srcFiles = dir(db);
 f_resumen=fopen(strcat(out,'resumen.csv'),'w');
-<
+
 fprintf(f_resumen,'Imagen; fitness; tiempo\n');
 
 for i = 1 : length(srcFiles)

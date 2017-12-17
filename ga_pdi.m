@@ -18,9 +18,9 @@ opts.TolFun=0;
 opts.StallGenLimit=1000;
 opts.Display='iter';
 opts.PopulationType='bitstring';
-opts.PopulationSize=30;
+opts.PopulationSize=40;
 % opts.TimeLimit=10;
-opts.Generations=1000;
+opts.Generations=500;
 opts.CrossoverFcn=@crossovertwopoint;
 opts.CrossoverFraction=0.75;
 opts.UseParallel=false;
@@ -32,10 +32,10 @@ fprintf(fbest,'Tiempo; best; promedio; cuartil3; max; min; quartil1;c ;ssim\n');
 
 F=[];
 tt=tic()
-for i=1:10
+for i=1:1
     fid=fopen(strcat(out,'iter_',int2str(i),'.csv'),'w');
     tini=tic();
-    opts.OutputFcns=@(options,state,flag)log_in_file(options,state,flag,fid,fbest,tini,I,size_cuadrante);
+    opts.OutputFcns=@(options,state,flag)log_in_file(options,state,flag,fid,fbest,tini,I,size_cuadrante,out,int2str(i));
     [x,Fval,exitFlag,Output] = ga(f_fitness,size_cuadrante*size_cuadrante-1,opts);
     F(i)=Fval;
     fclose(fid);

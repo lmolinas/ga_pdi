@@ -4,17 +4,17 @@ function resultado = funcion_objetivo_real(S,R,varargin)
 
 
 nVarargs = length(varargin);
-if nVarargs ==0
+if nVarargs == 0
     [c1]=CONTRASTE(S)/127.5;
 else
-    c1=varargin{0};
+    c1=varargin{1};
 end
-
-[similaridad]=ssim(S,R);
+ [similaridad]=nssim(S,R);
 delta=(c2-c1);
 resultado=0;
 if(delta>0)
-    resultado=(similaridad+c2)/2;
+     resultado=(similaridad+delta)/2;
+%       resultado=c2;
 end
 end
 

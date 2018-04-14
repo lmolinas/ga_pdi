@@ -19,7 +19,6 @@ opts.StallGenLimit=1500;
 opts.Display='iter';
 opts.PopulationType='bitstring';
 opts.PopulationSize=50;
-% opts.TimeLimit=10;
 opts.Generations=1500;
 opts.CrossoverFcn=@crossovertwopoint;
 opts.CrossoverFraction=0.75;

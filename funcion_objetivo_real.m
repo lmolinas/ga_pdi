@@ -13,7 +13,7 @@ end
 delta=(c2-c1);
 resultado=0;
 if(delta>0)
-     resultado=(similaridad+c2)/2;
+     resultado=(similaridad+delta)/2;
 %       resultado=c2;
 end
 end

@@ -1,5 +1,5 @@
 addpath('db');
-out='out_20171213-c/';
+out='pruebas/12042018-2/';
 db='db/';
 mkdir(out);
 srcFiles = dir(db);

@@ -9,18 +9,17 @@ I=gpuArray(I);
 mkdir(out);
 
 fbest=fopen(strcat(out,'bests.csv'),'w');
-size_cuadrante=7;
+size_cuadrante=17;
 f_fitness = @(S)funcion_objetivo(I,S,size_cuadrante,CONTRASTE(I)/127.5);
 
 % definir los parametros del GA
 opts = gaoptimset(@ga);
 opts.TolFun=0;
-opts.StallGenLimit=1000;
+opts.StallGenLimit=1500;
 opts.Display='iter';
 opts.PopulationType='bitstring';
-opts.PopulationSize=40;
-% opts.TimeLimit=10;
-opts.Generations=500;
+opts.PopulationSize=50;
+opts.Generations=1500;
 opts.CrossoverFcn=@crossovertwopoint;
 opts.CrossoverFraction=0.75;
 opts.UseParallel=false;

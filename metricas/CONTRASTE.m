@@ -5,9 +5,8 @@ function [v]= CONTRASTE(im)
 hist=imhist(im)';
 t=numel(hist);
 hist=hist/numel(im);
-
-
 E=mean(mean(im));
+
 k=double(0:t-1);
 ke_pk=(k-E).^2.*hist;
 v=sqrt(sum(ke_pk));

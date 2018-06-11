@@ -1,7 +1,7 @@
 addpath('./metricas')
 
 path='db/';
-out_path=strcat(pwd,'\resumen\');
+out_path=strcat(pwd,'\r20180611\');
 mkdir(out_path);
 srcFiles = dir(path); 
 filename = strcat(out_path,'ref.xls');

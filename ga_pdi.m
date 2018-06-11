@@ -15,11 +15,11 @@ f_fitness = @(S)funcion_objetivo(I,S,size_cuadrante,CONTRASTE(I)/127.5);
 % definir los parametros del GA
 opts = gaoptimset(@ga);
 opts.TolFun=0;
-opts.StallGenLimit=1500;
+opts.StallGenLimit=500;
 opts.Display='iter';
 opts.PopulationType='bitstring';
-opts.PopulationSize=50;
-opts.Generations=1500;
+opts.PopulationSize=40;
+opts.Generations=500;
 opts.CrossoverFcn=@crossovertwopoint;
 opts.CrossoverFraction=0.75;
 opts.UseParallel=false;

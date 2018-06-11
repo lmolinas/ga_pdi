@@ -28,12 +28,15 @@ for i=1:4
 
     k=double(0:t-1);
     ke_pk=(k-E).^2.*hist;
-    valores(i)=sqrt(sum(ke_pk));
+    
     if isa(valores(i),'gpuArray') 
+        valores(i)=gather(sqrt(sum(ke_pk)));
         clear hist;
         clear t;
         clear E;
         clear ke_pk;
+    else
+       valores(i)=sqrt(sum(ke_pk)); 
     end
     
 end

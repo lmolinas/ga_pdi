@@ -178,7 +178,13 @@ else
     if (exponents(3) > 0)
         num = sigmaxy + C(3);
         if isempty(sigmaxsigmay)
-            sigmaxsigmay = sqrt(sigmax2.*sigmay2);
+            x=sigmax2.*sigmay2;
+            if(min(min(x)))<0
+                x
+                sigmax2
+                sigmay2
+            end
+            sigmaxsigmay = sqrt(x);
         end
         den = sigmaxsigmay + C(3); 
         ssimmap = ssimmap.*guardedDivideAndExponent(num,den,C(3),exponents(3));        

@@ -10,9 +10,9 @@ switch flag
     case {'iter','interrupt'}
         
         if rem(state.Generation,10) == 0
-            ss = size(history,3);
-            history(:,:,ss+1) = state.Population;
-            assignin('base','gapopulationhistory',history);
+%             ss = size(history,3);
+%             history(:,:,ss+1) = state.Population;
+%             assignin('base','gapopulationhistory',history);
         end
         
         score=1-state.Score;

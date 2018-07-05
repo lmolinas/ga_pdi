@@ -179,10 +179,9 @@ else
         num = sigmaxy + C(3);
         if isempty(sigmaxsigmay)
             x=sigmax2.*sigmay2;
-            if(min(min(x)))<0
-                x
-                sigmax2
-                sigmay2
+            if(min(min(x)))
+                
+               save('corregir',A,ref,gaussFilt,sigmax2,sigmay2);
             end
             sigmaxsigmay = sqrt(x);
         end

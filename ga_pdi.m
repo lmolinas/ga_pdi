@@ -1,4 +1,4 @@
-function resultado = ga_pdi(I,out)
+function resultado = ga_pdi(I,out, size_cuadrante)
 %% 
 addpath('metricas');
 if ndims(I)==3
@@ -9,7 +9,6 @@ I=gpuArray(I);
 mkdir(out);
 
 fbest=fopen(strcat(out,'bests.csv'),'w');
-size_cuadrante=17;
 f_fitness = @(S)funcion_objetivo(I,S,size_cuadrante,CONTRASTE(I)/127.5);
 % definir los parametros del GA
 opts = gaoptimset(@ga);

@@ -23,6 +23,6 @@ dc=(2*c1*c2+C)/(c1^2+c2^2+C);
 if(c1>c2)
    dc=dc*-1; 
 end
-resultado=[similaridad dc]';
+resultado=[similaridad c2]';
 end
 

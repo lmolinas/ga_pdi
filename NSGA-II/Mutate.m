@@ -24,6 +24,7 @@ function y=Mutate(x,mu,sigma)
     
     y=x;
     
-    y(j)=x(j).'+sigma.*randn(size(j));
+    %y(j)=x(j).'+sigma.*randn(size(j));
+    y(j)=mod(x(j)+1,2);
 
 end

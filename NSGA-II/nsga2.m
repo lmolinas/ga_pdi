@@ -96,7 +96,7 @@ function nsga2(I, size_cuadrante)
             i2=randi([1 nPop]);
             p2=pop(i2);
 
-            [popc(k,1).Position, popc(k,2).Position]=Crossover(p1.Position,p2.Position);
+            [popc(k,1).Position, popc(k,2).Position]=Crossover(VarMin,VarMax,p1.Position,p2.Position);
 
             popc(k,1).Cost=CostFunction(popc(k,1).Position);
             popc(k,2).Cost=CostFunction(popc(k,2).Position);

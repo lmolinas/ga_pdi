@@ -1,10 +1,10 @@
-function resultado = ga_pdi(I,out, size_cuadrante)
+function resultado = ga_pdi(I,out, size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
 %% 
 addpath('metricas');
-if ndims(I)==3
-    I=rgb2gray(I);
-end
-I=gpuArray(I);
+%if ndims(I)==3
+%    I=rgb2gray(I);
+%end
+%I=gpuArray(I);
 
 mkdir(out);
 
@@ -13,15 +13,15 @@ f_fitness = @(S)funcion_objetivo(I,S,size_cuadrante,CONTRASTE(I)/127.5);
 % definir los parametros del GA
 opts = gaoptimset(@ga);
 opts.TolFun=0;
-opts.StallGenLimit=800;
+opts.StallGenLimit=pGenerations;
 opts.Display='iter';
 opts.PopulationType='bitstring';
-opts.PopulationSize=80;
-opts.Generations=800;
+opts.PopulationSize=pPopulationSize;
+opts.Generations=pGenerations;
 opts.CrossoverFcn=@crossovertwopoint;
-opts.CrossoverFraction=0.75;
+opts.CrossoverFraction=pCrossoverFraction;
 opts.UseParallel=false;
-opts.MutationFcn={@mutationuniform, 0.025};
+opts.MutationFcn={@mutationuniform, pMutationRate};
 opts.SelectionFcn=@selectiontournament;
 
 fprintf(fbest,'Tiempo; best; promedio; cuartil3; max; min; quartil1;c ;ssim\n');
@@ -29,7 +29,7 @@ fprintf(fbest,'Tiempo; best; promedio; cuartil3; max; min; quartil1;c ;ssim\n');
 
 F=[];
 tt=tic()
-for i=1:2
+for i=1:1%CAMBIAR EL 1 AFECTA LA RESPUESTA
     fid=fopen(strcat(out,'iter_',int2str(i),'.csv'),'w');
     try
         tini=tic();
@@ -50,5 +50,5 @@ end
 resultado={};
 resultado.mejor=mean(1-F);
 resultado.tiempo=final;
-
+resultado.S1=x;
 end

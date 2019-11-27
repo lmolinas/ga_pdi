@@ -10,7 +10,7 @@
 % 
 % Contact Info: sm.kalami@gmail.com, info@yarpiz.com
 %
-function nsga2(I, size_cuadrante)
+function nsga2(I, ra, size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
     addpath('metricas');
     if ndims(I)==3
         I=rgb2gray(I);
@@ -38,17 +38,17 @@ function nsga2(I, size_cuadrante)
 
     %% NSGA-II Parameters
 
-    MaxIt=100;      % Maximum Number of Iterations
+    MaxIt=pGenerations;      % Maximum Number of Iterations
 
-    nPop=50;        % Population Size
+    nPop=pPopulationSize;        % Population Size
 
-    pCrossover=0.7;                         % Crossover Percentage
+    pCrossover=pCrossoverFraction;                         % Crossover Percentage
     nCrossover=2*round(pCrossover*nPop/2);  % Number of Parnets (Offsprings)
 
-    pMutation=0.4;                          % Mutation Percentage
+    pMutation=0.4;                          % Mutation Percentage --NO SE ENCUENTRA EN EL DE RAINER
     nMutation=round(pMutation*nPop);        % Number of Mutants
 
-    mu=0.02;                    % Mutation Rate
+    mu=pMutationRate;                    % Mutation Rate
 
     sigma=0.1*(VarMax-VarMin);  % Mutation Step Size
 
@@ -151,7 +151,7 @@ function nsga2(I, size_cuadrante)
 
         % Plot F1 Costs
         figure(1);
-        PlotCosts(F1);
+        PlotCosts(F1, ra);
         pause(0.01);
 
     end

@@ -10,12 +10,16 @@
 % 
 % Contact Info: sm.kalami@gmail.com, info@yarpiz.com
 %
-function nsga2(I, ra, size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
+function resultado = nsga2(out, I, ra, size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
     addpath('metricas');
     if ndims(I)==3
         I=rgb2gray(I);
     end
     %I=gpuArray(I);
+
+    mkdir(out);
+    fpareto=fopen(strcat(out,'pareto.csv'),'w');
+    fprintf(fpareto,'ssim; contraste(c)\n');
 
     %clc;
     %clear;
@@ -81,6 +85,8 @@ function nsga2(I, ra, size_cuadrante, pPopulationSize, pGenerations, pCrossoverF
     % Sort Population
     [pop, F]=SortPopulation(pop);
 
+
+    tt=tic();
 
     %% NSGA-II Main Loop
 
@@ -155,6 +161,26 @@ function nsga2(I, ra, size_cuadrante, pPopulationSize, pGenerations, pCrossoverF
         pause(0.01);
 
     end
+    %pause;
+    
+    final=toc(tt);
+    
+    fprintf(fpareto,'%g ;%g\n', [F1.Cost]);
+    fclose(fpareto);
 
+    for i = 1 : length(F1)
+        bestx=F1(i).Position;
+        SR=convertir_individuo2se(bestx,size_cuadrante);
+        R=metodologia_morfologica(I, strel('arbitrary',SR));
+        imwrite(SR,strcat(strcat(out, int2str(i)), '_se.png'));
+        imwrite(gather(R),strcat(strcat(out, int2str(i)), '_t.png'));   
+    end
+    
+    if isa(I,'gpuArray') 
+        clear I;
+    end
     %% Results
+    resultado={};
+    resultado.tiempo=final;
+    resultado.FS1=F1;
 end

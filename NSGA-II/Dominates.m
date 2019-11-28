@@ -21,6 +21,6 @@ function b=Dominates(x,y)
         y=y.Cost;
     end
 
-    b=all(x<=y) && any(x<y);
+    b=all(x>=y) && any(x>y);%se supone maximizacion.
 
 end

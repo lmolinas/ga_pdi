@@ -13,12 +13,13 @@ mkdir(outFecha);
 size_cuadrante=17;
 pCrossoverFraction=0.75;
 pMutationRate=0.025;
-pPopulationSize=80;
-pGenerations=800;
+pPopulationSize=3;
+pGenerations=3;
 
 f_parametros=fopen(strcat(outFecha, 'parametros.csv'),'w');
 fprintf(f_parametros,'size_cuadrante; pCrossoverFraction; pMutationRate; pPopulationSize; pGenerations\n');
 fprintf(f_parametros,'%g; %g; %g; %g; %g\n',size_cuadrante, pCrossoverFraction, pMutationRate, pPopulationSize, pGenerations);
+fclose(f_parametros);
         
 outRainer=strcat(outFecha,'Rainer/');
 mkdir(outRainer);
@@ -29,6 +30,11 @@ outArEv=strcat(outFecha,'ArEv/');
 mkdir(outArEv);
 f_resumenArEv=fopen(strcat(outArEv,'resumen.csv'),'w');
 fprintf(f_resumenArEv,'Imagen; tiempo\n');
+
+outArEvLambda=strcat(outFecha,'ArEv-lambda/');
+mkdir(outArEvLambda);
+f_resumenArEvLambda=fopen(strcat(outArEvLambda,'resumen.csv'),'w');
+fprintf(f_resumenArEvLambda,'Imagen; tiempo\n');
 
 db='db/';
 srcFiles = dir(db);
@@ -42,13 +48,19 @@ for i = 1 : length(srcFiles)
         %I=gpuArray(I);
         r=ga_pdi(I,strcat(outRainer,srcFiles(i).name,'/'), size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
         fprintf(f_resumen,'%s; %f; %f\n',srcFiles(i).name,r.mejor,r.tiempo);
-        ra=funcion_objetivo_nsga_ii(I,r.S1,size_cuadrante,CONTRASTE(I)/127.5);
-        rnsga2=nsga2(strcat(outArEv,srcFiles(i).name,'/'), I, ra, size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
+        
+        bits_lambda=0;
+        ra=funcion_objetivo_nsga_ii(I,r.S1,size_cuadrante,bits_lambda,CONTRASTE(I)/127.5);
+        rnsga2=nsga2(strcat(outArEv,srcFiles(i).name,'/'), I, ra, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
         fprintf(f_resumenArEv,'%s; %f\n',srcFiles(i).name,rnsga2.tiempo);
+        
+        bits_lambda=3;
+        rnsga2_lambda=nsga2(strcat(outArEvLambda,srcFiles(i).name,'/'), I, ra, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
+        fprintf(f_resumenArEvLambda,'%s; %f\n',srcFiles(i).name,rnsga2_lambda.tiempo);
+        
         %reset(gpuDevice());
     end
 end
-fclose(f_parametros);
 fclose(f_resumen);
 fclose(f_resumenArEv);
-
+fclose(f_resumenArEvLambda);

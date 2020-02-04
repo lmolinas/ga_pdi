@@ -10,7 +10,7 @@
 % 
 % Contact Info: sm.kalami@gmail.com, info@yarpiz.com
 %
-function resultado = nsga2(out, I, ra, size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
+function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
     addpath('metricas');
     if ndims(I)==3
         I=rgb2gray(I);
@@ -20,16 +20,23 @@ function resultado = nsga2(out, I, ra, size_cuadrante, pPopulationSize, pGenerat
     mkdir(out);
     fpareto=fopen(strcat(out,'pareto.csv'),'w');
     fprintf(fpareto,'ssim; contraste(c)\n');
+    fparetoSE=fopen(strcat(out,'paretoSE.csv'),'w');
+    fprintf(fparetoSE,'lambda; Elemento Estructurante\n');
 
+    fparetoXiter=fopen(strcat(out,'pareto-x-iter.csv'),'w');
+    fprintf(fparetoXiter,'Generacion; ssim; contraste(c)\n');
+    fparetoXiterSE=fopen(strcat(out,'pareto-x-iter_SE.csv'),'w');
+    fprintf(fparetoXiterSE,'Generacion; lambda; Elemento Estructurante\n');
+    
     %clc;
     %clear;
     %close all;
 
     %% Problem Definition
 
-    CostFunction=@(S)funcion_objetivo_nsga_ii(I,S,size_cuadrante,CONTRASTE(I)/127.5);      % Cost Function
+    CostFunction=@(S)funcion_objetivo_nsga_ii(I,S,size_cuadrante,bits_lambda,CONTRASTE(I)/127.5);      % Cost Function
 
-    nVar=size_cuadrante*size_cuadrante-1;             % Number of Decision Variables
+    nVar=(size_cuadrante*size_cuadrante-1) + bits_lambda;             % Number of Decision Variables
 
     VarSize=[1 nVar];   % Size of Decision Variables Matrix
 
@@ -59,6 +66,8 @@ function resultado = nsga2(out, I, ra, size_cuadrante, pPopulationSize, pGenerat
 
     %% Initialization
 
+    tt=tic();
+
     empty_individual.Position=[];
     empty_individual.Cost=[];
     empty_individual.Rank=[];
@@ -84,9 +93,6 @@ function resultado = nsga2(out, I, ra, size_cuadrante, pPopulationSize, pGenerat
 
     % Sort Population
     [pop, F]=SortPopulation(pop);
-
-
-    tt=tic();
 
     %% NSGA-II Main Loop
 
@@ -154,24 +160,37 @@ function resultado = nsga2(out, I, ra, size_cuadrante, pPopulationSize, pGenerat
 
         % Show Iteration Information
         disp(['Iteration ' num2str(it) ': Number of F1 Members = ' num2str(numel(F1))]);
+        
+        itmat=zeros(1,numel(F1));%Se crea un matriz de 1x[cant-indiv-pareto]
+        itmat(:)=it;%se agrega el nro de iteracion para el log.
+        fprintf(fparetoXiter,'%g ;%g ;%g\n', [itmat; F1.Cost]);
+        fprintf(fparetoXiterSE,'%g ;%g ;%g\n', [itmat; F1.Cost]);
 
         % Plot F1 Costs
-        figure(1);
-        PlotCosts(F1, ra);
-        pause(0.01);
+        %figure(1);
+        %PlotCosts(F1, ra);
+        %pause(0.01);
 
     end
-    %pause;
     
     final=toc(tt);
     
     fprintf(fpareto,'%g ;%g\n', [F1.Cost]);
+    fprintf(fparetoSE,'%g ;%g\n', mat2str(F1.Position));
     fclose(fpareto);
+    fclose(fparetoSE);
+    fclose(fparetoXiter);
+    fclose(fparetoXiterSE);
 
     for i = 1 : length(F1)
         bestx=F1(i).Position;
-        SR=convertir_individuo2se(bestx,size_cuadrante);
-        R=metodologia_morfologica(I, strel('arbitrary',SR));
+        if bits_lambda > 0
+            SR=convertir_individuo2se(bestx(1:numel(bestx)-bits_lambda),size_cuadrante);
+            R=metodologia_morfologica_lambda(I, strel('arbitrary',SR), bi2de(bestx(numel(bestx)-bits_lambda+1:numel(bestx)))+1);
+        else
+            SR=convertir_individuo2se(bestx,size_cuadrante);
+            R=metodologia_morfologica(I, strel('arbitrary',SR));
+        end
         imwrite(SR,strcat(strcat(out, int2str(i)), '_se.png'));
         imwrite(gather(R),strcat(strcat(out, int2str(i)), '_t.png'));   
     end

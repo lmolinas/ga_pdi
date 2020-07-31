@@ -10,7 +10,7 @@
 % 
 % Contact Info: sm.kalami@gmail.com, info@yarpiz.com
 %
-function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
+function resultado = nsga2(out, I, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
     addpath('metricas');
     if ndims(I)==3
         I=rgb2gray(I);
@@ -34,11 +34,13 @@ function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationS
 
     %% Problem Definition
 
-    CostFunction=@(S)funcion_objetivo_nsga_ii(I,S,size_cuadrante,bits_lambda,CONTRASTE(I)/127.5);      % Cost Function
+    CostFunction=@(S,L)funcion_objetivo_nsga_ii(I,S,L,size_cuadrante);      % Cost Function
 
-    nVar=(size_cuadrante*size_cuadrante-1) + bits_lambda;             % Number of Decision Variables
-
+    nVar=(size_cuadrante*size_cuadrante-1);             % Number of Decision Variables
+    nVarLambda=bits_lambda;                             % Number of Decision Variables para lambda
+    
     VarSize=[1 nVar];   % Size of Decision Variables Matrix
+    VarSizeLambda=[1 nVarLambda];   % Size of Decision Variables Matrix para lambda
 
     VarMin=0;          % Lower Bound of Variables
     VarMax=1;          % Upper Bound of Variables
@@ -61,6 +63,7 @@ function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationS
 
     mu=pMutationRate;                    % Mutation Rate
 
+    %sigma no tiene sentido para binario. No se usa la variable sigma aquí
     sigma=0.1*(VarMax-VarMin);  % Mutation Step Size
 
 
@@ -69,6 +72,7 @@ function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationS
     tt=tic();
 
     empty_individual.Position=[];
+    empty_individual.Lambda=[];
     empty_individual.Cost=[];
     empty_individual.Rank=[];
     empty_individual.DominationSet=[];
@@ -80,8 +84,9 @@ function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationS
     for i=1:nPop
 
         pop(i).Position=randi([VarMin,VarMax],VarSize);
+        pop(i).Lambda=randi([VarMin,VarMax],VarSizeLambda);
 
-        pop(i).Cost=CostFunction(pop(i).Position);
+        pop(i).Cost=CostFunction(pop(i).Position, pop(i).Lambda);
 
     end
 
@@ -109,9 +114,10 @@ function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationS
             p2=pop(i2);
 
             [popc(k,1).Position, popc(k,2).Position]=Crossover(VarMin,VarMax,p1.Position,p2.Position);
+            [popc(k,1).Lambda, popc(k,2).Lambda]=Crossover(VarMin,VarMax,p1.Lambda,p2.Lambda);
 
-            popc(k,1).Cost=CostFunction(popc(k,1).Position);
-            popc(k,2).Cost=CostFunction(popc(k,2).Position);
+            popc(k,1).Cost=CostFunction(popc(k,1).Position,popc(k,1).Lambda);
+            popc(k,2).Cost=CostFunction(popc(k,2).Position,popc(k,2).Lambda);
 
         end
         popc=popc(:);
@@ -124,8 +130,9 @@ function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationS
             p=pop(i);
 
             popm(k).Position=Mutate(p.Position,mu,sigma);
+            popm(k).Lambda=Mutate(p.Lambda,mu,sigma);
 
-            popm(k).Cost=CostFunction(popm(k).Position);
+            popm(k).Cost=CostFunction(popm(k).Position,popm(k).Lambda);
 
         end
 
@@ -160,39 +167,42 @@ function resultado = nsga2(out, I, ra, size_cuadrante, bits_lambda, pPopulationS
 
         % Show Iteration Information
         disp(['Iteration ' num2str(it) ': Number of F1 Members = ' num2str(numel(F1))]);
-        
+
         itmat=zeros(1,numel(F1));%Se crea un matriz de 1x[cant-indiv-pareto]
         itmat(:)=it;%se agrega el nro de iteracion para el log.
         fprintf(fparetoXiter,'%g ;%g ;%g\n', [itmat; F1.Cost]);
-        fprintf(fparetoXiterSE,'%g ;%g ;%g\n', [itmat; F1.Cost]);
+        fprintf(fparetoXiterSE,'%g ;%g ;%g\n', [itmat; F1.Lambda; F1.Cost]);
 
         % Plot F1 Costs
         %figure(1);
         %PlotCosts(F1, ra);
         %pause(0.01);
-
+            
     end
     
     final=toc(tt);
     
     fprintf(fpareto,'%g ;%g\n', [F1.Cost]);
     fprintf(fparetoSE,'%g ;%g\n', mat2str(F1.Position));
+    
     fclose(fpareto);
     fclose(fparetoSE);
     fclose(fparetoXiter);
     fclose(fparetoXiterSE);
 
+    %Archivar SE y Resultado T
     for i = 1 : length(F1)
         bestx=F1(i).Position;
-        if bits_lambda > 0
-            SR=convertir_individuo2se(bestx(1:numel(bestx)-bits_lambda),size_cuadrante);
-            R=metodologia_morfologica_lambda(I, strel('arbitrary',SR), bi2de(bestx(numel(bestx)-bits_lambda+1:numel(bestx)))+1);
+        bestl=F1(i).Lambda;
+        
+        SR=convertir_individuo2se(bestx,size_cuadrante);
+        if isempty(bestl)
+            R=metodologia_morfologica_lambda(I, strel('arbitrary',SR), bi2de(bestl)+1);
         else
-            SR=convertir_individuo2se(bestx,size_cuadrante);
             R=metodologia_morfologica(I, strel('arbitrary',SR));
         end
         imwrite(SR,strcat(strcat(out, int2str(i)), '_se.png'));
-        imwrite(gather(R),strcat(strcat(out, int2str(i)), '_t.png'));   
+        imwrite(gather(R),strcat(strcat(out, int2str(i)), '_t.png'));
     end
     
     if isa(I,'gpuArray') 

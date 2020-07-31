@@ -10,11 +10,11 @@ fecha = datestr(now,formatOut);
 outFecha=strcat('pruebas/',fecha,'/');
 mkdir(outFecha);
 
-size_cuadrante=17;
+size_cuadrante=4;
 pCrossoverFraction=0.75;
 pMutationRate=0.025;
-pPopulationSize=3;
-pGenerations=3;
+pPopulationSize=10;
+pGenerations=5;
 
 f_parametros=fopen(strcat(outFecha, 'parametros.csv'),'w');
 fprintf(f_parametros,'size_cuadrante; pCrossoverFraction; pMutationRate; pPopulationSize; pGenerations\n');
@@ -46,16 +46,15 @@ for i = 1 : length(srcFiles)
             I=rgb2gray(I);
         end
         %I=gpuArray(I);
-        r=ga_pdi(I,strcat(outRainer,srcFiles(i).name,'/'), size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
-        fprintf(f_resumen,'%s; %f; %f\n',srcFiles(i).name,r.mejor,r.tiempo);
+        %r=ga_pdi(I,strcat(outRainer,srcFiles(i).name,'/'), size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
+        %fprintf(f_resumen,'%s; %f; %f\n',srcFiles(i).name,r.mejor,r.tiempo);
         
         bits_lambda=0;
-        ra=funcion_objetivo_nsga_ii(I,r.S1,size_cuadrante,bits_lambda,CONTRASTE(I)/127.5);
-        rnsga2=nsga2(strcat(outArEv,srcFiles(i).name,'/'), I, ra, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
+        rnsga2=nsga2(strcat(outArEv,srcFiles(i).name,'/'), I, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
         fprintf(f_resumenArEv,'%s; %f\n',srcFiles(i).name,rnsga2.tiempo);
         
-        bits_lambda=3;
-        rnsga2_lambda=nsga2(strcat(outArEvLambda,srcFiles(i).name,'/'), I, ra, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
+        bits_lambda=3;% 3 bits para representar numeros del 1 al 8.
+        rnsga2_lambda=nsga2(strcat(outArEvLambda,srcFiles(i).name,'/'), I, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
         fprintf(f_resumenArEvLambda,'%s; %f\n',srcFiles(i).name,rnsga2_lambda.tiempo);
         
         %reset(gpuDevice());

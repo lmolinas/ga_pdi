@@ -46,13 +46,17 @@ for i = 1 : length(srcFiles)
             I=rgb2gray(I);
         end
         %I=gpuArray(I);
-        %r=ga_pdi(I,strcat(outRainer,srcFiles(i).name,'/'), size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
-        %fprintf(f_resumen,'%s; %f; %f\n',srcFiles(i).name,r.mejor,r.tiempo);
+        %EL algoritmo de Rainer
+        r=ga_pdi(I,strcat(outRainer,srcFiles(i).name,'/'), size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
+
+        fprintf(f_resumen,'%s; %f; %f\n',srcFiles(i).name,r.mejor,r.tiempo);
         
+        %nuestro algoritmo
         bits_lambda=0;
         rnsga2=nsga2(strcat(outArEv,srcFiles(i).name,'/'), I, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
         fprintf(f_resumenArEv,'%s; %f\n',srcFiles(i).name,rnsga2.tiempo);
         
+        %nuestro algoritmo con lambda
         bits_lambda=3;% 3 bits para representar numeros del 1 al 8.
         rnsga2_lambda=nsga2(strcat(outArEvLambda,srcFiles(i).name,'/'), I, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate);
         fprintf(f_resumenArEvLambda,'%s; %f\n',srcFiles(i).name,rnsga2_lambda.tiempo);

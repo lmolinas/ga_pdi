@@ -171,7 +171,7 @@ function resultado = nsga2(out, I, size_cuadrante, bits_lambda, pPopulationSize,
         itmat=zeros(1,numel(F1));%Se crea un matriz de 1x[cant-indiv-pareto]
         itmat(:)=it;%se agrega el nro de iteracion para el log.
         fprintf(fparetoXiter,'%g ;%g ;%g\n', [itmat; F1.Cost]);
-        fprintf(fparetoXiterSE,'%g ;%g ;%g\n', [itmat; F1.Lambda; F1.Cost]);
+%        fprintf(fparetoXiterSE,'%g ;%g ;%g\n', [itmat; F1.Lambda; F1.Cost]);
 
         % Plot F1 Costs
         %figure(1);
@@ -183,7 +183,7 @@ function resultado = nsga2(out, I, size_cuadrante, bits_lambda, pPopulationSize,
     final=toc(tt);
     
     fprintf(fpareto,'%g ;%g\n', [F1.Cost]);
-    fprintf(fparetoSE,'%g ;%g\n', mat2str(F1.Position));
+    %fprintf(fparetoSE,'%g ;%g\n', mat2str(F1.Position));
     
     fclose(fpareto);
     fclose(fparetoSE);
@@ -197,9 +197,10 @@ function resultado = nsga2(out, I, size_cuadrante, bits_lambda, pPopulationSize,
         
         SR=convertir_individuo2se(bestx,size_cuadrante);
         if isempty(bestl)
-            R=metodologia_morfologica_lambda(I, strel('arbitrary',SR), bi2de(bestl)+1);
-        else
             R=metodologia_morfologica(I, strel('arbitrary',SR));
+            
+        else
+            R=metodologia_morfologica_lambda(I, strel('arbitrary',SR), bi2de(bestl)+1);
         end
         imwrite(SR,strcat(strcat(out, int2str(i)), '_se.png'));
         imwrite(gather(R),strcat(strcat(out, int2str(i)), '_t.png'));

@@ -11,12 +11,13 @@
 % Contact Info: sm.kalami@gmail.com, info@yarpiz.com
 %
 
-function [y1, y2]=Crossover(VarMin,VarMax,x1,x2)
-
-    %alpha=rand(size(x1));
-    alpha=randi([VarMin,VarMax],size(x1));
+function [y1, y2]=Crossover(x1,x2)
+    s=numel(x1);
+    alpha=randi(s);
     
-    y1=alpha.*x1+(1-alpha).*x2;
-    y2=alpha.*x2+(1-alpha).*x1;
+%    y1=alpha.*x1+(1-alpha).*x2;
+%    y2=alpha.*x2+(1-alpha).*x1;
     
+    y1 = [x1(1:alpha) x2(alpha+1:s)];
+    y2 = [x2(1:alpha) x1(alpha+1:s)];
 end

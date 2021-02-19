@@ -1,4 +1,4 @@
-function resultado = ga_pdi(I,out, size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
+function resultado = ga_pdi(I,out, size_cuadrante, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate, pMaxTime)
 %% 
 addpath('metricas');
 %if ndims(I)==3
@@ -18,11 +18,12 @@ opts.Display='iter';
 opts.PopulationType='bitstring';
 opts.PopulationSize=pPopulationSize;
 opts.Generations=pGenerations;
-opts.CrossoverFcn=@crossovertwopoint;
+opts.CrossoverFcn=@crossoversinglepoint;%Se corrige según documento.
 opts.CrossoverFraction=pCrossoverFraction;
 opts.UseParallel=false;
 opts.MutationFcn={@mutationuniform, pMutationRate};
 opts.SelectionFcn=@selectiontournament;
+opts.MaxTime=pMaxTime;%en segundos, se agrega por tiempo, para las comparaciones
 
 fprintf(fbest,'Tiempo; best; promedio; cuartil3; max; min; quartil1;c ;ssim\n');
 

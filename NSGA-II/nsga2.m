@@ -10,7 +10,7 @@
 % 
 % Contact Info: sm.kalami@gmail.com, info@yarpiz.com
 %
-function resultado = nsga2(out, I, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate)
+function resultado = nsga2(out, I, size_cuadrante, bits_lambda, pPopulationSize, pGenerations, pCrossoverFraction, pMutationRate, pMaxTime)
     addpath('metricas');
     if ndims(I)==3
         I=rgb2gray(I);
@@ -113,9 +113,11 @@ function resultado = nsga2(out, I, size_cuadrante, bits_lambda, pPopulationSize,
             i2=randi([1 nPop]);
             p2=pop(i2);
 
-            [popc(k,1).Position, popc(k,2).Position]=Crossover(VarMin,VarMax,p1.Position,p2.Position);
-            [popc(k,1).Lambda, popc(k,2).Lambda]=Crossover(VarMin,VarMax,p1.Lambda,p2.Lambda);
-
+            [popc(k,1).Position, popc(k,2).Position]=Crossover(p1.Position,p2.Position);
+            if ~isempty(p1.Lambda)
+                [popc(k,1).Lambda, popc(k,2).Lambda]=Crossover(p1.Lambda,p2.Lambda);
+            end
+            
             popc(k,1).Cost=CostFunction(popc(k,1).Position,popc(k,1).Lambda);
             popc(k,2).Cost=CostFunction(popc(k,2).Position,popc(k,2).Lambda);
 
@@ -129,8 +131,8 @@ function resultado = nsga2(out, I, size_cuadrante, bits_lambda, pPopulationSize,
             i=randi([1 nPop]);
             p=pop(i);
 
-            popm(k).Position=Mutate(p.Position,mu,sigma);
-            popm(k).Lambda=Mutate(p.Lambda,mu,sigma);
+            popm(k).Position=Mutate(p.Position,mu);
+            popm(k).Lambda=Mutate(p.Lambda,mu);
 
             popm(k).Cost=CostFunction(popm(k).Position,popm(k).Lambda);
 

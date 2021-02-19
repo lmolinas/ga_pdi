@@ -11,20 +11,16 @@
 % Contact Info: sm.kalami@gmail.com, info@yarpiz.com
 %
 
-function y=Mutate(x,mu,sigma)
-
+function y=Mutate(x,mu)
+    
     nVar=numel(x);
     
     nMu=ceil(mu*nVar);
 
     j=randsample(nVar,nMu);
-    if numel(sigma)>1
-        sigma = sigma(j);
-    end
     
     y=x;
     
-    %y(j)=x(j).'+sigma.*randn(size(j));
-    y(j)=abs(x(j)-1);
+    y(j)=1-x(j);
 
 end
